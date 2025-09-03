@@ -1,0 +1,2 @@
+The receiver should not have the types instead the user should select the receiver when placing the order.
+Then receiver could approve the request fully or reassign the some of the items to another receiver.
