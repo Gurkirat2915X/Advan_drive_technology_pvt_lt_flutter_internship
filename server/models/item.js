@@ -19,7 +19,16 @@ const itemSchema = new mongoose.Schema({
     type: Number,
     required: true,
     min: 0
-  }
+  }, 
+  reassignedTo: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    default: null
+  },
+  notes: {
+    type: String,
+    default: ""
+  },
 });
 
 const Item = mongoose.model("Item", itemSchema);

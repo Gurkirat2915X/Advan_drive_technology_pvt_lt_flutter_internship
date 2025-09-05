@@ -76,6 +76,7 @@ const request2 = new Request({
   items: [item2._id],
     status: "pending"
 });
+console.log(request);
 
 await request.save();
 await request2.save();

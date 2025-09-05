@@ -1,5 +1,7 @@
 import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:request_app/models/user.dart";
+import "package:request_app/providers/item_types_provider.dart";
+import "package:request_app/providers/reassigned_provider.dart";
 import "package:request_app/providers/receivers_provider.dart";
 import "package:request_app/providers/requests_provider.dart";
 import "package:request_app/services/api.dart";
@@ -8,12 +10,41 @@ import "package:request_app/services/storage.dart";
 class AuthProvider extends StateNotifier<User> {
   AuthProvider() : super(User.empty());
 
-  void loadUserData() async {
+  void loadUserData(WidgetRef ref) async {
     User loadedUser = await loadUserFromStorage();
     if (loadedUser.token.isNotEmpty) {
       bool valid = await isLoggedIn(loadedUser);
       if (valid) {
         print("ok");
+        try {
+          await ref
+              .read(requestsProvider.notifier)
+              .loadRequests(loadedUser, ref);
+        } catch (e) {
+          print('Failed to load requests: $e');
+        }
+        try {
+          await ref
+              .read(receiversProvider.notifier)
+              .loadReceivers(loadedUser, ref);
+        } catch (e) {
+          print('Failed to load receivers: $e');
+        }
+        try {
+          await ref
+              .read(itemTypesProvider.notifier)
+              .loadItemTypes(loadedUser, ref);
+        } catch (e) {
+          print('Failed to load item types: $e');
+        }
+        if(loadedUser.role == 'receiver'){
+          print("receiver");
+          try {
+            await ref.read(reassignedProvider.notifier).loadReassigned(loadedUser, ref);
+          } catch (e) {
+            print('Failed to load receiver profile: $e');
+          }
+        }
         state = loadedUser;
       } else {
         state = User.empty();
@@ -25,15 +56,33 @@ class AuthProvider extends StateNotifier<User> {
   Future<bool> login(String username, String password, WidgetRef ref) async {
     try {
       User currentUser = await loginUser(username, password);
-      await ref.read(requestsProvider.notifier).loadRequests(ref);
-      await ref.read(receiversProvider.notifier).loadReceivers(ref);
+      try {
+        await ref
+            .read(requestsProvider.notifier)
+            .loadRequests(currentUser, ref);
+      } catch (e) {
+        print('Failed to load requests: $e');
+      }
+      try {
+        await ref
+            .read(receiversProvider.notifier)
+            .loadReceivers(currentUser, ref);
+      } catch (e) {
+        print('Failed to load receivers: $e');
+      }
+      try {
+        await ref
+            .read(itemTypesProvider.notifier)
+            .loadItemTypes(currentUser, ref);
+      } catch (e) {
+        print('Failed to load item types: $e');
+      }
       print("saved");
       await saveUserToStorage(currentUser);
       state = currentUser;
-  
       return true;
     } catch (e) {
-      print(e);
+      print('Login error: $e');
       return false;
     }
   }

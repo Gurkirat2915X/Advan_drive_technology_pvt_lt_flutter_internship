@@ -16,16 +16,6 @@ itemsRouter.get("/all", async (req, res) => {
   }
 });
 
-itemsRouter.post("/add", async (req, res) => {
-  const { name, description,  } = req.body;
-  try {
-    const newItem = new Item({ name, description, price });
-    await newItem.save();
-    res.status(201).json({ message: "Item added successfully", item: newItem });
-  } catch (error) {
-    res.status(400).json({ message: "Failed to add item", error: error.message });
-  }
-});
 
 itemsRouter.get("/types", async (req, res) => {
   res.status(200).json({ message: "Fetched item types successfully", itemTypes });

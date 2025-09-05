@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:request_app/providers/auth_provider.dart';
 import 'package:request_app/screens/end_user/tabs.dart';
-import 'package:request_app/screens/receiver/home.dart';
+import 'package:request_app/screens/receiver/tabs.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
@@ -49,7 +49,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         if (mounted) {
           if (user.isReceiver) {
             Navigator.of(context).pushReplacement(
-              MaterialPageRoute(builder: (_) => const ReceiverHomeScreen()),
+              MaterialPageRoute(builder: (_) => const ReceiverTabs()),
             );
           } else if (user.isEndUser) {
             Navigator.of(context).pushReplacement(

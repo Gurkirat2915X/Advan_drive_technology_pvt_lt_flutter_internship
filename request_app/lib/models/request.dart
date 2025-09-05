@@ -32,4 +32,18 @@ class Request {
       createdAt: DateTime.parse(json['createdAt'] ?? DateTime.now().toString()),
     );
   }
+  Map<String, dynamic> toJson() {
+    return {
+      "id": id,
+      'name': name,
+      'user': userId,
+      'status': status,
+      'items': items.map((item) => item.toJson()).toList(),
+      'receiver': receiverId,
+    };
+  }
+  @override
+  String toString() {
+    return 'Request{name: $name, id: $id, userId: $userId, status: $status, items: $items, createdAt: $createdAt, receiverId: $receiverId}';
+  }
 }

@@ -27,7 +27,13 @@ class RequestDetailScreen extends ConsumerWidget {
             const SizedBox(height: 16),
             const Text('Items:'),
             for (var item in request.items)
-              Text(' - ${item.name} (ID: ${item.id})'),
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 4.0),
+                child: Text(
+                  '• Name: ${item.name}, Type: ${item.type}, Quantity: ${item.quantity}, Status: ${item.status}, ID: ${item.id}',
+                  style: const TextStyle(fontSize: 16),
+                ),
+              ),
           ],
         ),
       ),
