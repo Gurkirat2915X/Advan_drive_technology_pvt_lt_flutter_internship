@@ -9,12 +9,17 @@ class ReceiversProvider extends StateNotifier<List<Map<String, String>>> {
 
   Future<void> loadReceivers(User user, WidgetRef ref) async {
     try {
-      state = await getReceivers(user);
+      final newReceivers = await getReceivers(user);
+      state = newReceivers;
     } catch (error) {
       print('Failed to load receivers: $error');
       await ref.read(authProvider.notifier).logout();
       throw Exception("Failed to load receivers");
     }
+  }
+
+  void refreshReceivers(User user, WidgetRef ref) {
+    loadReceivers(user, ref);
   }
 }
 

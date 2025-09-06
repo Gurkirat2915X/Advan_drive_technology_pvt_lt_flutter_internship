@@ -5,6 +5,7 @@ import { createServer } from "http";
 import ConnectDBWithRetry from "./db/db.js";
 import apiRouter from "./routers/apiRoutes.js";
 import cookieParser from "cookie-parser";
+
 dotenv.config();
 
 const app = express();
@@ -21,6 +22,7 @@ const PORT = process.env.PORT || 3000;
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
+
 try {
     ConnectDBWithRetry();
 } catch (error) {
@@ -43,16 +45,15 @@ io.on('connection', (socket) => {
     socket.join(room);
     console.log(`User ${socket.id} joined room: ${room}`);
   });
-
-  socket.on('room_message', (data) => {
-    // Send message to specific room
-    io.to(data.room).emit('room_message', data);
-  });
-
   socket.on('disconnect', () => {
     console.log('User disconnected:', socket.id);
   });
 });
+
+export function updateAll() {
+  console.log('Emitting update to all clients');
+  io.emit('message', { message: 'Data has been updated' });
+}
 
 server.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);

@@ -8,12 +8,17 @@ class ReassignedProvider extends StateNotifier<List<Item>> {
 
   Future<void> loadReassigned(User user, WidgetRef ref) async {
     try {
-      state = await api.getReassignment(user);
+      final newReassigned = await api.getReassignment(user);
+      state = newReassigned;
       print('Reassigned items loaded: $state');
     } catch (error) {
       print('Failed to load reassigned items: $error');
       throw Exception("Failed to load reassigned items");
     }
+  }
+
+  void refreshReassigned(User user, WidgetRef ref) {
+    loadReassigned(user, ref);
   }
 
   Future<void> acceptReassignment(User user, String itemId) async {

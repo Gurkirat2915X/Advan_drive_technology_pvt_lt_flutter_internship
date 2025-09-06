@@ -26,6 +26,7 @@ class _RequestApprovalScreenState extends ConsumerState<RequestApprovalScreen> {
       'item': item,
       'status': item.status,
       'selectedReceiver': null,
+      'selectedReceiverId': null,
       'reassignmentReason': '', // Add reason field
     }).toList();
   }
@@ -216,6 +217,7 @@ class _RequestApprovalScreenState extends ConsumerState<RequestApprovalScreen> {
                                 itemState['status'] = newStatus;
                                 if (newStatus != 'reassigned') {
                                   itemState['selectedReceiver'] = null;
+                                  itemState['selectedReceiverId'] = null;
                                 }
                               });
                             } : null,
@@ -224,16 +226,21 @@ class _RequestApprovalScreenState extends ConsumerState<RequestApprovalScreen> {
                           // Show receiver dropdown if status is reassigned and item is editable
                           if (itemState['status'] == 'reassigned' && isItemEditable) ...[
                             const SizedBox(height: 12),
-                            DropdownButtonFormField<Map<String, String>>(
+                            DropdownButtonFormField<String>(
                               decoration: const InputDecoration(labelText: 'Reassign to Receiver'),
-                              value: itemState['selectedReceiver'],
-                              items: availableReceivers.map((receiver) => DropdownMenuItem(
-                                value: receiver,
+                              value: itemState['selectedReceiverId'],
+                              items: availableReceivers.map((receiver) => DropdownMenuItem<String>(
+                                value: receiver['id'],
                                 child: Text(receiver['username'] ?? ''),
                               )).toList(),
-                              onChanged: (receiver) {
+                              onChanged: (receiverId) {
                                 setState(() {
-                                  itemState['selectedReceiver'] = receiver;
+                                  itemState['selectedReceiverId'] = receiverId;
+                                  // Also store the receiver object for easy access
+                                  itemState['selectedReceiver'] = availableReceivers.firstWhere(
+                                    (r) => r['id'] == receiverId,
+                                    orElse: () => <String, String>{},
+                                  );
                                 });
                               },
                               validator: (value) {

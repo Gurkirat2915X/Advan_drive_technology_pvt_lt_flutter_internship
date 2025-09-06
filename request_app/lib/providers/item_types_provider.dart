@@ -9,13 +9,18 @@ class ItemTypesProvider extends StateNotifier<List<String>> {
 
   Future<void> loadItemTypes(User user, WidgetRef ref) async {
     try {
-      state = await getItemTypes(user);
+      final newItemTypes = await getItemTypes(user);
+      state = newItemTypes;
       print('Item types loaded: $state');
     } catch (error) {
       await ref.read(authProvider.notifier).logout();
       print('Failed to load item types: $error');
       throw Exception("Failed to load item types");
     }
+  }
+
+  void refreshItemTypes(User user, WidgetRef ref) {
+    loadItemTypes(user, ref);
   }
 }
 

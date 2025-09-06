@@ -4,7 +4,7 @@ import itemsRouter from "./itemsRoutes.js";
 import requestRouter from "./requestRoutes.js";
 import { authMiddleware } from "../middleware/authMiddleware.js";
 import User from "../models/user.js";
-import reassignmentRouter from "./reassignment.js";
+import reassignmentRouter from "./reassignmentRoutes.js";
 
 const apiRouter = express.Router();
 

@@ -36,8 +36,8 @@ class MyApp extends ConsumerWidget {
             return Consumer(
               builder: (context, ref, child) {
                 final user = ref.watch(authProvider);
-                SocketService soc = new SocketService();
-                soc.connectToServer();
+                // Use singleton instance
+                SocketService().connectToServer(ref: ref);
                 if (user.role == 'receiver') {
                   return const ReceiverTabs();
                 } else if (user.role == 'end_user') {

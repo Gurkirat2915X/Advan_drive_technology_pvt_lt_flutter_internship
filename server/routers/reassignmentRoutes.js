@@ -1,8 +1,10 @@
+import { updateAll } from "../index.js";
 import Item from "../models/item.js";
 import Request from "../models/request.js";
 import express from "express";
 
 const reassignmentRouter = express.Router();
+
 
 reassignmentRouter.get("/all", async (req, res) => {
     try {
@@ -15,8 +17,6 @@ reassignmentRouter.get("/all", async (req, res) => {
             reassignedTo: req.user._id,
             status: 'reassigned'
         });
-
-        // Get the requests containing these items to provide context
         const itemIds = reassignedItems.map(item => item._id);
         const requests = await Request.find({ 
             items: { $in: itemIds } 
@@ -57,7 +57,6 @@ reassignmentRouter.get("/all", async (req, res) => {
     }
 });
 
-// Accept reassignment - mark item as fulfilled and remove reassignment
 reassignmentRouter.post("/accept/:itemId", async (req, res) => {
     try {
         if (!req.user) {
@@ -85,7 +84,10 @@ reassignmentRouter.post("/accept/:itemId", async (req, res) => {
 
         // Calculate and update request status
         const request = await Request.findOne({ items: itemId }).populate('items');
+        let updatedRequest = null;
+        let originalReceiverId = null;
         if (request) {
+            originalReceiverId = request.receiver; // The original receiver who made the reassignment
             const itemStatuses = request.items.map(item => item.status);
             const fulfilledCount = itemStatuses.filter(status => status === 'fulfilled').length;
             const totalCount = itemStatuses.length;
@@ -99,8 +101,12 @@ reassignmentRouter.post("/accept/:itemId", async (req, res) => {
                 newRequestStatus = 'pending';
             }
             
-            await Request.findByIdAndUpdate(request._id, { status: newRequestStatus });
+            updatedRequest = await Request.findByIdAndUpdate(request._id, { status: newRequestStatus }, { new: true })
+                .populate('items')
+                .populate('user', 'username')
+                .populate('receiver', 'username');
         }
+        updateAll(); 
 
         res.status(200).json({ 
             message: "Reassignment accepted successfully",
@@ -116,7 +122,6 @@ reassignmentRouter.post("/accept/:itemId", async (req, res) => {
     }
 });
 
-// Reject reassignment - mark item as pending and remove reassignment
 reassignmentRouter.post("/reject/:itemId", async (req, res) => {
     try {
         if (!req.user) {
@@ -125,7 +130,7 @@ reassignmentRouter.post("/reject/:itemId", async (req, res) => {
 
         const { itemId } = req.params;
 
-        // Verify the item is reassigned to the current user
+        
         const item = await Item.findById(itemId);
         if (!item) {
             return res.status(404).json({ message: "Item not found" });
@@ -135,16 +140,18 @@ reassignmentRouter.post("/reject/:itemId", async (req, res) => {
             return res.status(403).json({ message: "This item is not reassigned to you" });
         }
 
-        // Update item: mark as pending and remove reassignment
+       updateAll(); 
         await Item.findByIdAndUpdate(itemId, {
             status: 'pending',
             reassignedTo: null,
             notes: ''
         });
 
-        // Update request status if needed
         const request = await Request.findOne({ items: itemId }).populate('items');
+        let updatedRequest = null;
+        let originalReceiverId = null;
         if (request) {
+            originalReceiverId = request.receiver; // The original receiver who made the reassignment
             const itemStatuses = request.items.map(item => item.status);
             const fulfilledCount = itemStatuses.filter(status => status === 'fulfilled').length;
             
@@ -157,10 +164,12 @@ reassignmentRouter.post("/reject/:itemId", async (req, res) => {
                 newRequestStatus = 'pending';
             }
             
-            await Request.findByIdAndUpdate(request._id, { status: newRequestStatus });
+            updatedRequest = await Request.findByIdAndUpdate(request._id, { status: newRequestStatus }, { new: true })
+                .populate('items')
+                .populate('user', 'username')
+                .populate('receiver', 'username');
         }
-
-        res.status(200).json({ 
+        res.status(200).json({
             message: "Reassignment rejected successfully",
             itemId: itemId,
             newStatus: 'pending'

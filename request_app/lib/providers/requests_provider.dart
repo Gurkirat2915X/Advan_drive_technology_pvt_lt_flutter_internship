@@ -9,12 +9,17 @@ class RequestsProvider extends StateNotifier<List<Request>> {
 
   Future<void> loadRequests(User user, WidgetRef ref) async {
     try {
-      state = await api.getRequests(user);
+      final newRequests = await api.getRequests(user);
+      state = newRequests;
     } catch (error) {
       print('Failed to load requests: $error');
       await ref.read(authProvider.notifier).logout();
       throw Exception("Failed to load requests");
     }
+  }
+
+  void refreshRequests(User user, WidgetRef ref) {
+    loadRequests(user, ref);
   }
 
   Future<void> updateRequest(User user, Request request) async {
