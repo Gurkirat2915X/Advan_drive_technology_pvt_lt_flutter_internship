@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:request_app/providers/auth_provider.dart';
+import 'package:request_app/providers/network_provider.dart';
 import 'package:request_app/providers/reassigned_provider.dart';
 import 'package:request_app/models/item.dart';
+import 'package:request_app/widgets/network_status_widget.dart';
 
 class ReassignedScreen extends ConsumerStatefulWidget {
   const ReassignedScreen({super.key});
@@ -26,6 +28,13 @@ class _ReassignedScreenState extends ConsumerState<ReassignedScreen> {
     });
     try {
       final user = ref.read(authProvider);
+      
+      // Check network connectivity before making API call
+      final isConnected = ref.read(networkProvider);
+      if (!isConnected) {
+        throw Exception('No internet connection');
+      }
+      
       await ref.read(reassignedProvider.notifier).loadReassigned(user, ref);
     } catch (error) {
       if (mounted) {
@@ -45,13 +54,23 @@ class _ReassignedScreenState extends ConsumerState<ReassignedScreen> {
   @override
   Widget build(BuildContext context) {
     final reassignedItems = ref.watch(reassignedProvider);
+    final isConnected = ref.watch(networkProvider);
 
     if (_isLoading) {
       return const Center(child: CircularProgressIndicator());
     }
 
+    // Show network-aware content
+    return NetworkAwareWidget(
+      onRetry: _loadReassignedItems,
+      child: _buildContent(context, reassignedItems, isConnected),
+    );
+  }
+
+  Widget _buildContent(BuildContext context, List<Item> reassignedItems, bool isConnected) {
+
     if (reassignedItems.isEmpty) {
-      return const Center(
+      return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -60,7 +79,7 @@ class _ReassignedScreenState extends ConsumerState<ReassignedScreen> {
               size: 64,
               color: Colors.grey,
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
             Text(
               'No Reassigned Items',
               style: TextStyle(
@@ -69,11 +88,35 @@ class _ReassignedScreenState extends ConsumerState<ReassignedScreen> {
                 color: Colors.grey,
               ),
             ),
-            SizedBox(height: 8),
+            const SizedBox(height: 8),
             Text(
               'No items have been reassigned to you yet.',
               style: TextStyle(color: Colors.grey),
             ),
+            if (!isConnected) ...[
+              const SizedBox(height: 16),
+              Container(
+                padding: const EdgeInsets.all(12),
+                margin: const EdgeInsets.symmetric(horizontal: 32),
+                decoration: BoxDecoration(
+                  color: Colors.orange.shade100,
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: Colors.orange.shade300),
+                ),
+                child: Row(
+                  children: const [
+                    Icon(Icons.wifi_off, color: Colors.orange, size: 16),
+                    SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        'No internet connection. Data may not be up to date.',
+                        style: TextStyle(color: Colors.orange, fontSize: 12),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ],
         ),
       );
@@ -283,6 +326,20 @@ class _ReassignedScreenState extends ConsumerState<ReassignedScreen> {
   }
 
   void _acceptReassignment(Item item) async {
+    // Check network before attempting action
+    final isConnected = ref.read(networkProvider);
+    if (!isConnected) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('No internet connection. Please try again later.'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+      return;
+    }
+
     try {
       final user = ref.read(authProvider);
       await ref.read(reassignedProvider.notifier).acceptReassignment(user, item.id);
@@ -308,6 +365,20 @@ class _ReassignedScreenState extends ConsumerState<ReassignedScreen> {
   }
 
   void _rejectReassignment(Item item) async {
+    // Check network before attempting action
+    final isConnected = ref.read(networkProvider);
+    if (!isConnected) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('No internet connection. Please try again later.'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+      return;
+    }
+
     try {
       final user = ref.read(authProvider);
       await ref.read(reassignedProvider.notifier).rejectReassignment(user, item.id);

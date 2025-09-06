@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:http/http.dart' as http;
 import 'package:request_app/models/item.dart';
@@ -8,21 +9,43 @@ import 'package:request_app/variables.dart';
 
 const headers = {'Content-Type': 'application/json', 'User-Agent': "True"};
 
-Future<User> loginUser(String username, String password) async {
-  Uri url = Uri.parse('$backendUrl/auth/login');
-  final response = await http.post(
-    url,
-    headers: headers,
-    body: jsonEncode({'username': username, 'password': password}),
-  );
-  print(response.body);
-  if (response.statusCode == 200) {
-    final data = jsonDecode(response.body);
-
-    return User.fromJson(data);
-  } else {
-    throw Exception('Failed to login');
+// Network-aware HTTP wrapper
+Future<T> _networkAwareRequest<T>(
+  Future<T> Function() request,
+  String operation,
+) async {
+  try {
+    return await request();
+  } on SocketException {
+    throw Exception('No internet connection. Please check your network and try again.');
+  } on http.ClientException {
+    throw Exception('Connection failed. Please try again.');
+  } catch (e) {
+    if (e.toString().contains('Connection refused') || 
+        e.toString().contains('Network is unreachable') ||
+        e.toString().contains('Connection timed out')) {
+      throw Exception('Network error: Unable to connect to server.');
+    }
+    rethrow;
   }
+}
+
+Future<User> loginUser(String username, String password) async {
+  return _networkAwareRequest(() async {
+    Uri url = Uri.parse('$backendUrl/auth/login');
+    final response = await http.post(
+      url,
+      headers: headers,
+      body: jsonEncode({'username': username, 'password': password}),
+    );
+    print(response.body);
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      return User.fromJson(data);
+    } else {
+      throw Exception('Failed to login');
+    }
+  }, 'login');
 }
 
 Future<bool> isLoggedIn(User cur) async {
@@ -87,21 +110,23 @@ Future<List<String>> getItemTypes(User user) async {
   }
 }
 
-    Future<List<Item>> getReassignment(User user) async {
-  Uri url = Uri.parse('$backendUrl/reassignment/all');
-  final response = await http.get(
-    url,
-    headers: {...headers, 'Cookie': 'token=${user.token}'},
-  );
-  print(response.body);
-  if (response.statusCode == 200) {
-    final data = jsonDecode(response.body);
-    return (data as List)
-        .map((item) => Item.fromJson(item))
-        .toList();
-  } else {
-    throw Exception('Failed to load reassigned items');
-  }
+Future<List<Item>> getReassignment(User user) async {
+  return _networkAwareRequest(() async {
+    Uri url = Uri.parse('$backendUrl/reassignment/all');
+    final response = await http.get(
+      url,
+      headers: {...headers, 'Cookie': 'token=${user.token}'},
+    );
+    print(response.body);
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      return (data as List)
+          .map((item) => Item.fromJson(item))
+          .toList();
+    } else {
+      throw Exception('Failed to load reassigned items');
+    }
+  }, 'get reassignments');
 }
 
 Future<void> acceptReassignment(User user, String itemId) async {

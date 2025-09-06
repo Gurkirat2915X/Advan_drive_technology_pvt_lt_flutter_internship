@@ -3,6 +3,7 @@ import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:request_app/models/request.dart";
 import "package:request_app/models/item.dart";
 import "package:request_app/providers/auth_provider.dart";
+import "package:request_app/providers/network_provider.dart";
 import "package:request_app/providers/requests_provider.dart";
 import 'package:request_app/providers/receivers_provider.dart';
 import 'package:request_app/providers/item_types_provider.dart';
@@ -15,6 +16,7 @@ class NewRequestScreen extends ConsumerWidget {
       final receivers = ref.watch(receiversProvider);
       final itemTypes = ref.watch(itemTypesProvider);
       final user = ref.watch(authProvider);
+      final isConnected = ref.watch(networkProvider);
 
       final _formKey = GlobalKey<FormState>();
       final _nameController = TextEditingController();
@@ -40,17 +42,45 @@ class NewRequestScreen extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('New Request'),
+        backgroundColor: isConnected ? null : Colors.red.shade700,
+        foregroundColor: isConnected ? null : Colors.white,
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: StatefulBuilder(
-          builder: (context, setState) {
-            return Form(
-              key: _formKey,
-              child: SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
+      body: Column(
+        children: [
+          // Network status banner
+          if (!isConnected)
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+              color: Colors.red.shade100,
+              child: Row(
+                children: [
+                  Icon(Icons.wifi_off, color: Colors.red.shade700, size: 20),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      'No internet connection. Please check your network.',
+                      style: TextStyle(
+                        color: Colors.red.shade700,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          // Main content
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: StatefulBuilder(
+                builder: (context, setState) {
+                  return Form(
+                    key: _formKey,
+                    child: SingleChildScrollView(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
                     TextFormField(
                       controller: _nameController,
                       decoration: const InputDecoration(labelText: 'Request Name'),
@@ -133,7 +163,17 @@ class NewRequestScreen extends ConsumerWidget {
                     const SizedBox(height: 24),
                     ElevatedButton(
                       onPressed: () async{
-                        if (_formKey.currentState!.validate()) {
+                        if (!isConnected) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('No internet connection. Please check your network and try again.'),
+                              backgroundColor: Colors.red,
+                            ),
+                          );
+                          return;
+                        }
+
+                        if (_formKey.currentState!.validate() && selectedReceiverId != null) {
                           final requestItems = items.map((item) => Item(
                             id: '',
                             name: item['nameController'].text.trim(),
@@ -164,7 +204,15 @@ class NewRequestScreen extends ConsumerWidget {
                           }
                         }
                       },
-                      child: const Text('Submit Request'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: isConnected ? null : Colors.grey,
+                      ),
+                      child: Text(
+                        isConnected ? 'Submit Request' : 'No Internet Connection',
+                        style: TextStyle(
+                          color: isConnected ? null : Colors.white70,
+                        ),
+                      ),
                     ),
                   ],
                 ),
@@ -172,6 +220,9 @@ class NewRequestScreen extends ConsumerWidget {
             );
           },
         ),
+      ),
+    ),
+        ],
       ),
     );
   }

@@ -6,6 +6,7 @@ import "package:request_app/providers/requests_provider.dart";
 import "package:request_app/providers/receivers_provider.dart";
 import "package:request_app/providers/item_types_provider.dart";
 import "package:request_app/providers/reassigned_provider.dart";
+import "package:request_app/services/network_service.dart";
 
 class SocketService {
   static final SocketService _instance = SocketService._internal();
@@ -16,13 +17,21 @@ class SocketService {
   WidgetRef? _ref;
   bool _isUpdating = false;
   bool _isConnected = false;
+  final NetworkService _networkService = NetworkService();
 
-  void connectToServer({WidgetRef? ref}) {
+  void connectToServer({WidgetRef? ref}) async {
     if (_isConnected) {
       print('Socket already connected');
       if (ref != null) {
         _ref = ref;
       }
+      return;
+    }
+
+    // Check network connectivity before connecting
+    final hasConnection = await _networkService.hasInternetConnection();
+    if (!hasConnection) {
+      print('No internet connection, cannot connect to socket');
       return;
     }
 
@@ -63,6 +72,14 @@ class SocketService {
     socket.onDisconnect((_) {
       print('Disconnected from server');
       _isConnected = false;
+      
+      // Try to reconnect after a delay if network is available
+      Future.delayed(const Duration(seconds: 3), () async {
+        if (await _networkService.hasInternetConnection()) {
+          print('Attempting to reconnect to socket...');
+          connectToServer(ref: _ref);
+        }
+      });
     });
   }
 
