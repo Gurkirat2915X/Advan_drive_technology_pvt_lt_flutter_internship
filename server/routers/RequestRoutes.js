@@ -50,10 +50,6 @@ async function handleItemReassignment(
   }
 }
 
-requestRouter.get("/health", (req, res) => {
-  res.status(200).json({ message: "OK" });
-});
-
 requestRouter.get("/all", async (req, res) => {
   try {
     if (!req.user) {

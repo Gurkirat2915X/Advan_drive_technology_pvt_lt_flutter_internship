@@ -3,21 +3,6 @@ import Item, { itemTypes } from "../models/item.js";
 
 const itemsRouter = express.Router();
 
-itemsRouter.get("/health", (req, res) => {
-  res.status(200).json({ message: "OK" });
-});
-
-itemsRouter.get("/all", async (req, res) => {
-  try {
-    const items = await Item.find();
-    res.status(200).json({ message: "Fetched all items successfully", items });
-  } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Failed to fetch items", error: error.message });
-  }
-});
-
 itemsRouter.get("/types", async (req, res) => {
   res
     .status(200)

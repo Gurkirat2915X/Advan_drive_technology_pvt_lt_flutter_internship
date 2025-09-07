@@ -1,37 +1,38 @@
 # 📱 Flutter Request Handling Workflow Application
 
+## ADVAN DRIVE TECHNOLOGIES PRIVATE LIMITED TASK
+
 A full-stack mobile application built with Flutter and Node.js that implements a real-world request and confirmation workflow system with dual-role functionality.
-
-## 🎯 Project Overview
-
-This application solves the challenge of managing item requests between end users and receivers in a structured workflow. It implements a complete system where end users can submit requests for multiple items, and receivers can review and process these requests item by item, with real-time status updates and partial fulfillment capabilities.
 
 ## 🏗️ System Architecture
 
 ### Frontend (Flutter)
+
 - **Framework**: Flutter with Dart
 - **State Management**: Riverpod for reactive state management
 - **UI Framework**: Material Design 3 with adaptive theming
-- **Real-time Communication**: WebSocket integration with fallback polling
+- **Real-time Communication**: WebSocket integration using Socket.io with fallback polling
 - **Authentication**: JWT-based role authentication
 
 ### Backend (Node.js)
+
 - **Runtime**: Node.js with Express.js
 - **Database**: MongoDB for data persistence
-- **Real-time**: WebSocket server for live updates
+- **Real-time**: WebSocket server using Socket.io for live updates
 - **Authentication**: JWT tokens with bcrypt password hashing
 - **API**: RESTful endpoints with proper error handling
 
 ## 🚀 Features Implemented
 
 ### ✅ End User Role
+
 - **Request Creation**: Select multiple items with quantities and submit requests
 - **Status Tracking**: Real-time view of request statuses (Pending, Confirmed, Partially Fulfilled)
 - **Request History**: Complete history with detailed item breakdowns
 - **Progress Monitoring**: Live updates when receivers process items
-- **Navigation**: Seamless navigation to request details and completed requests
 
 ### ✅ Receiver Role
+
 - **Request Review**: View all assigned pending requests with priority sorting
 - **Item-by-Item Processing**: Individual item confirmation with status options:
   - Fulfilled
@@ -42,32 +43,17 @@ This application solves the challenge of managing item requests between end user
 - **Notes System**: Add reassignment reasons and processing notes
 
 ### ✅ Advanced Features
+
 - **Real-time Updates**: WebSocket-powered live synchronization
 - **Offline Support**: Graceful handling of network interruptions
 - **Error Recovery**: Robust error handling with retry mechanisms
 - **Responsive Design**: Adaptive UI for different screen sizes
 - **Dark/Light Theme**: System-adaptive theming support
-- **Performance Optimization**: Efficient state management and API calls
-
-## 📱 User Interface Highlights
-
-### Design Principles
-- **Material Design 3**: Modern, accessible interface components
-- **Contrast Optimization**: Enhanced visibility in both light and dark modes
-- **Touch-Friendly**: Proper spacing and touch targets
-- **Navigation**: Intuitive tab-based navigation with role-specific screens
-- **Visual Feedback**: Loading states, animations, and status indicators
-
-### Key UI Components
-- **Gradient Header Cards**: Enhanced visual hierarchy for requests
-- **Interactive Request Cards**: Clickable items with visual feedback
-- **Status Indicators**: Color-coded status badges with icons
-- **Form Controls**: Accessible dropdowns and input fields
-- **Action Buttons**: Prominent CTAs with proper states
 
 ## 🔧 Technical Implementation
 
 ### State Management Architecture
+
 ```dart
 // Riverpod Provider Pattern
 final authProvider = StateNotifierProvider<AuthProvider, User>((ref) => AuthProvider());
@@ -75,6 +61,7 @@ final requestsProvider = StateNotifierProvider<RequestsProvider, List<Request>>(
 ```
 
 ### Real-time Communication
+
 ```dart
 // WebSocket Integration
 class SocketService {
@@ -87,6 +74,7 @@ class SocketService {
 ```
 
 ### Authentication Flow
+
 ```dart
 // JWT-based Authentication
 class AuthProvider extends StateNotifier<User> {
@@ -99,31 +87,42 @@ class AuthProvider extends StateNotifier<User> {
 ## 🔗 API Endpoints
 
 ### Authentication
+
 - `POST /auth/login` - User authentication
 - `POST /auth/register` - User registration
 
 ### Requests Management
-- `GET /api/requests` - Fetch user requests
-- `POST /api/requests` - Create new request
-- `PUT /api/requests/:id` - Update request status
 
-### Items & Receivers
-- `GET /api/items` - Fetch available items
-- `GET /api/receivers` - Fetch available receivers
-- `POST /api/reassign` - Reassign items to receivers
+- `GET /api/request/all` - Fetch endUser/receiver requests
+- `POST /api/request/add` - Create new request
+- `POST /api/request/update` - Update request status
 
-### Real-time
-- `WebSocket /socket` - Real-time updates channel
+### Items
+
+- `GET /api/item/types` - Fetch available items types
+
+### Reassignments
+
+- `GET /api/reassignment/all` - get all the reassignments for a receiver
+- `POST /api/reassignment/accept/:id` - accept a reassignment
+- `GET /api/reassignment/reject/:id` - reject a reassignment
+
+### Others
+
+- `GET /api/verifyToken` - verify JWT token validity
+- `GET /api/receivers` - fetch all receivers
 
 ## 🛠️ Setup Instructions
 
 ### Prerequisites
+
 - Flutter SDK (≥3.0.0)
 - Node.js (≥16.0.0)
 - MongoDB (≥4.4)
 - VS Code with Flutter extension (recommended)
 
 ### Backend Setup
+
 ```bash
 # Navigate to server directory
 cd server
@@ -133,7 +132,7 @@ npm install
 
 # Set up environment variables
 cp .env.example .env
-# Edit .env with your MongoDB connection string refer  
+# Edit .env with your MongoDB connection string refer  .env copy
 
 # Start the server
 node index.js
@@ -141,31 +140,35 @@ node index.js
 ```
 
 ### Flutter App Setup
+
 ```bash
 # Navigate to app directory
 cd request_app
 
 # Install dependencies
 flutter pub get
-
+## add a variables.dart file in the folder refer the variables_copy.dart
 # Run the application
 flutter run
 # Select your target device (Android/iOS/Web)
 ```
 
 ### Database Setup
+
 ```bash
 # Start MongoDB service
 mongod
 
 # The application will automatically create required collections
 # Demo data can be created using the provided script:
-node server/scripts/create_demo.js
+# Important: This is will remove existing data
+npm run create-demo-data
 ```
 
 ## 🎮 Usage Workflow
 
 ### End User Journey
+
 1. **Login**: Authenticate as end user
 2. **Create Request**: Select items and quantities
 3. **Submit**: Send request to system
@@ -173,6 +176,7 @@ node server/scripts/create_demo.js
 5. **Review**: View completed and partial fulfillments
 
 ### Receiver Journey
+
 1. **Login**: Authenticate as receiver
 2. **Review Queue**: View pending requests
 3. **Process Items**: Confirm availability item by item
@@ -191,45 +195,36 @@ Item Processing → Status Updates → Real-time Sync
 Partial/Complete Fulfillment → End User Notification
 ```
 
-## 🧪 Key Problem Solutions
+## 🧪 Key Problem Faced
 
 ### 1. Real-time Updates Without Firebase
+
 **Problem**: Need live updates without external services
 **Solution**: Custom WebSocket implementation with message queuing and automatic reconnection
 
 ### 2. Partial Request Fulfillment
+
 **Problem**: Handle scenarios where only some items are available
 **Solution**: Item-level status tracking with reassignment workflow
 
 ### 3. Authentication State Management
+
 **Problem**: Login screen flashing during app startup
 **Solution**: Loading state pattern with proper initialization lifecycle
 
 ### 4. UI Contrast & Accessibility
+
 **Problem**: Poor visibility in dark mode
 **Solution**: Dynamic color schemes with proper contrast ratios
 
 ### 5. Offline Handling
+
 **Problem**: Network interruptions breaking functionality
 **Solution**: Queue-based operations with retry mechanisms
 
-## 📊 Performance Optimizations
-
-- **Efficient State Updates**: Minimal rebuilds with targeted provider updates
-- **Memory Management**: Proper disposal of controllers and listeners
-- **Network Optimization**: Request deduplication and caching
-- **UI Responsiveness**: Non-blocking operations with proper loading states
-
-## 🔐 Security Features
-
-- **JWT Authentication**: Secure token-based authentication
-- **Role-based Access**: Proper permission validation
-- **Password Hashing**: bcrypt for secure password storage
-- **Input Validation**: Server-side validation for all inputs
-
-## 🎯 Achievement Summary
 
 ### ✅ Core Requirements Met
+
 - [x] Dual-role functionality (End User & Receiver)
 - [x] Item-by-item confirmation workflow
 - [x] Partial fulfillment with reassignment
@@ -240,6 +235,7 @@ Partial/Complete Fulfillment → End User Notification
 - [x] Comprehensive error handling
 
 ### ✅ Advanced Features Added
+
 - [x] WebSocket real-time communication
 - [x] Dark/Light theme support
 - [x] Offline capability with queue management
@@ -249,21 +245,9 @@ Partial/Complete Fulfillment → End User Notification
 
 ## 🎬 Demo Video
 
-A comprehensive demo video showcasing the complete workflow is available in the project repository, demonstrating:
-- End user request creation and submission
-- Receiver request processing and item confirmation
-- Real-time status updates and notifications
-- Partial fulfillment and reassignment workflow
-- Error handling and recovery scenarios
+A comprehensive demo video showcasing the complete workflow is available in YouTube: 
+[Demo Video Link](https://www.youtube.com/watch?v=your_video_link)
 
-## 🤝 Contributing
 
-This project demonstrates enterprise-level Flutter development practices and can serve as a reference for similar workflow applications. The modular architecture allows for easy extension and customization.
 
-## 📄 License
-
-This project is part of a Flutter internship assignment and is intended for educational and demonstration purposes.
-
----
-
-**Built with ❤️ using Flutter & Node.js**
+**Built with ❤️ by Gurkirat Singh Dhillon**

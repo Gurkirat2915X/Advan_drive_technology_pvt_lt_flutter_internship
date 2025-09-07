@@ -8,10 +8,6 @@ import reassignmentRouter from "./reassignmentRoutes.js";
 
 const apiRouter = express.Router();
 
-apiRouter.get("/health", (req, res) => {
-  res.json({ status: "healthy" });
-});
-
 apiRouter.use("/auth", authRouter);
 apiRouter.use("/item", authMiddleware, itemsRouter);
 apiRouter.use("/request", authMiddleware, requestRouter);

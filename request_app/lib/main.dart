@@ -15,7 +15,7 @@ void main() {
 
 class MyApp extends ConsumerStatefulWidget {
   const MyApp({super.key});
-  
+
   @override
   ConsumerState<MyApp> createState() => _MyAppState();
 }
@@ -48,9 +48,9 @@ class _MyAppState extends ConsumerState<MyApp> {
           if (user.isLoading) {
             return const SplashScreen();
           }
-          
+
           SocketService().connectToServer(ref: ref);
-          
+
           Widget mainContent;
           if (user.role == 'receiver') {
             mainContent = const ReceiverTabs();
@@ -59,7 +59,7 @@ class _MyAppState extends ConsumerState<MyApp> {
           } else {
             mainContent = const LoginScreen();
           }
-          
+
           return mainContent;
         },
       ),
