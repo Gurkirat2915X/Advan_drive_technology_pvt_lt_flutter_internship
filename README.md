@@ -1,6 +1,8 @@
 # 📱 Flutter Request Handling Workflow Application
 
-## ADVAN DRIVE TECHNOLOGIES PRIVATE LIMITED TASK
+## ADVAN DRIVE TECHNOLOGIES PRIVATE LIMITED FLUTTER INTERN TASK
+
+#### VIEW DEMO VIDEO: [Demo Video Link](https://youtu.be/-hnkYIDN7lc)
 
 A full-stack mobile application built with Flutter and Node.js that implements a real-world request and confirmation workflow system with dual-role functionality.
 
@@ -49,6 +51,26 @@ A full-stack mobile application built with Flutter and Node.js that implements a
 - **Error Recovery**: Robust error handling with retry mechanisms
 - **Responsive Design**: Adaptive UI for different screen sizes
 - **Dark/Light Theme**: System-adaptive theming support
+
+## 📱 App Screenshots
+
+### Authentication & User Interface
+
+| Login Screen (Light) | Login Screen (Dark) |
+|:---:|:---:|
+| ![Login Light](readmeImages/LoginWhite.png) | ![Login Dark](readmeImages/loginDark.png) |
+
+### End User Screens
+
+| Active Requests | New Request Creation | Request Details | Completed Requests |
+|:---:|:---:|:---:|:---:|
+| ![Active Requests](readmeImages/endUserActiveDark.png) | ![New Request](readmeImages/NewRequestDark.png) | ![Request Details](readmeImages/RequestDetailDark.png) | ![Completed Requests](readmeImages/endUserCompletedDark.png) |
+
+### Receiver Screens
+
+| Pending Requests | Request Approval |
+|:---:|:---:|
+| ![Receiver Pending](readmeImages/RecieverPending.png) | ![Request Approval](readmeImages/ReceiverRequestApproval.png) |
 
 ## 🔧 Technical Implementation
 
@@ -222,7 +244,6 @@ Partial/Complete Fulfillment → End User Notification
 **Problem**: Network interruptions breaking functionality
 **Solution**: Queue-based operations with retry mechanisms
 
-
 ### ✅ Core Requirements Met
 
 - [x] Dual-role functionality (End User & Receiver)
@@ -245,9 +266,7 @@ Partial/Complete Fulfillment → End User Notification
 
 ## 🎬 Demo Video
 
-A comprehensive demo video showcasing the complete workflow is available in YouTube: 
-[Demo Video Link](https://www.youtube.com/watch?v=your_video_link)
-
-
+A comprehensive demo video showcasing the complete workflow is available in YouTube:
+[Demo Video Link](https://youtu.be/-hnkYIDN7lc)
 
 **Built with ❤️ by Gurkirat Singh Dhillon**
