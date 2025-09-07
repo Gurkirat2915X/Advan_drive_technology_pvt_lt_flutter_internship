@@ -13,7 +13,7 @@ A full-stack mobile application built with Flutter and Node.js that implements a
 - **Framework**: Flutter with Dart
 - **State Management**: Riverpod for reactive state management
 - **UI Framework**: Material Design 3 with adaptive theming
-- **Real-time Communication**: WebSocket integration using Socket.io with fallback polling
+- **Real-time Communication**: WebSocket integration using Socket.io
 - **Authentication**: JWT-based role authentication
 
 ### Backend (Node.js)
