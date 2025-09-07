@@ -4,6 +4,7 @@ import 'package:request_app/providers/auth_provider.dart';
 import 'package:request_app/providers/network_provider.dart';
 import 'package:request_app/screens/completed_request.dart';
 import 'package:request_app/screens/login.dart';
+import 'package:request_app/services/socket.dart';
 import 'package:request_app/widgets/request.dart';
 
 class EndUserTabs extends ConsumerWidget {
@@ -11,6 +12,9 @@ class EndUserTabs extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // Ensure socket service has the latest ref to prevent expiration issues
+    SocketService().setRef(ref);
+    
     final isConnected = ref.watch(networkProvider);
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;

@@ -4,6 +4,7 @@ import 'package:request_app/providers/auth_provider.dart';
 import 'package:request_app/providers/network_provider.dart';
 import 'package:request_app/screens/end_user/tabs.dart';
 import 'package:request_app/screens/receiver/tabs.dart';
+import 'package:request_app/services/socket.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
@@ -47,6 +48,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
       if (success && mounted) {
         final user = ref.read(authProvider);
+        
+        // Initialize socket service with ref after successful login
+        SocketService().setRef(ref);
+        
         if (user.role == 'receiver') {
           Navigator.of(context).pushReplacement(
             MaterialPageRoute(builder: (context) => const ReceiverTabs()),
@@ -79,6 +84,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // Ensure socket service has the latest ref to prevent expiration issues
+    SocketService().setRef(ref);
+    
     final isConnected = ref.watch(networkProvider);
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;

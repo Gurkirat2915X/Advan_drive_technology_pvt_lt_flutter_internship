@@ -56,29 +56,6 @@ for (const endUser of process.env.END_USERS.split(" ")) {
   console.log(`Created End User: ${endUser}`);
 }
 
-console.log("Creating the some of the requests")
-const users = await User.find({ role: 'end_user' });
-const receivers = await User.find({ role: 'receiver' });
-const item = await Item.create({ name: 'Sample Item', type:"other",status:"fulfilled",quantity:100 });
-const item2 = await Item.create({ name: 'Sample Item 2', type:"other",status:"pending",quantity:50 });
-const request = new Request({
-  name: "Sample Request 1",
-  user: users[0]._id,
-  receiver: receivers[0]._id,
-  items: [item._id, item2._id],
-  status: "pending"
-});
 
-const request2 = new Request({
-  name: "Sample Request 2",
-  user: users[1]._id,
-  receiver: receivers[1]._id,
-  items: [item2._id],
-    status: "pending"
-});
-console.log(request);
-
-await request.save();
-await request2.save();
 
 mongoose.connection.close();
