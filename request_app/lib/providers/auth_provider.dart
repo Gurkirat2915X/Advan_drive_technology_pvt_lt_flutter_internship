@@ -8,9 +8,12 @@ import "package:request_app/services/api.dart";
 import "package:request_app/services/storage.dart";
 
 class AuthProvider extends StateNotifier<User> {
-  AuthProvider() : super(User.empty());
+  AuthProvider() : super(User.loading());
 
   void loadUserData(WidgetRef ref) async {
+    // Start with loading state
+    state = User.loading();
+    
     User loadedUser = await loadUserFromStorage();
     if (loadedUser.token.isNotEmpty) {
       bool valid = await isLoggedIn(loadedUser);
@@ -50,6 +53,9 @@ class AuthProvider extends StateNotifier<User> {
         state = User.empty();
         await clearUserFromStorage();
       }
+    } else {
+      // No stored user, set to empty (not loading)
+      state = User.empty();
     }
   }
 

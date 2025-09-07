@@ -68,9 +68,9 @@ requestRouter.get("/all", async (req, res) => {
 
     let allRequests;
     if (req.user.role == "receiver") {
-      const requests = await Request.find({ receiver: req.user._id }).populate(
-        "items"
-      );
+      const requests = await Request.find({ receiver: req.user._id })
+        .populate("items")
+        .sort({ createdAt: -1 }); // Sort by creation date, newest first
 
       console.log(
         `Receiver ${req.user._id} found ${requests.length} original requests`
@@ -81,9 +81,9 @@ requestRouter.get("/all", async (req, res) => {
         `Receiver ${req.user._id} final result: ${allRequests.length} requests`
       );
     } else {
-      allRequests = await Request.find({ user: req.user._id }).populate(
-        "items"
-      );
+      allRequests = await Request.find({ user: req.user._id })
+        .populate("items")
+        .sort({ createdAt: -1 }); // Sort by creation date, newest first
       console.log(
         `End user ${req.user._id} found ${allRequests.length} requests`
       );

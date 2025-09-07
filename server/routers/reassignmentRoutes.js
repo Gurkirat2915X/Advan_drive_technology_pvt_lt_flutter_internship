@@ -23,7 +23,9 @@ reassignmentRouter.get("/all", async (req, res) => {
         }).populate({
             path: 'items',
             match: { _id: { $in: itemIds } }
-        }).populate('user', 'username').populate('receiver', 'username');
+        }).populate('user', 'username')
+          .populate('receiver', 'username')
+          .sort({ createdAt: -1 }); // Sort by creation date, newest first
 
         // Create simplified response with item data
         const reassignedItemsWithContext = [];

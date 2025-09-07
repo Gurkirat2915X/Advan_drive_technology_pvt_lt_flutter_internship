@@ -9,6 +9,8 @@ class NetworkStatusWidget extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final isConnected = ref.watch(networkProvider);
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
 
     return Stack(
       children: [
@@ -19,17 +21,26 @@ class NetworkStatusWidget extends ConsumerWidget {
             left: 0,
             right: 0,
             child: Container(
-              color: Colors.red,
+              decoration: BoxDecoration(
+                color: colorScheme.error,
+                boxShadow: [
+                  BoxShadow(
+                    color: colorScheme.shadow.withOpacity(0.1),
+                    blurRadius: 4,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
               padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
               child: SafeArea(
                 bottom: false,
                 child: Row(
-                  children: const [
-                    Icon(Icons.wifi_off, color: Colors.white, size: 16),
-                    SizedBox(width: 8),
+                  children: [
+                    Icon(Icons.wifi_off, color: colorScheme.onError, size: 16),
+                    const SizedBox(width: 8),
                     Text(
                       'No Internet Connection',
-                      style: TextStyle(color: Colors.white, fontSize: 14),
+                      style: TextStyle(color: colorScheme.onError, fontSize: 14),
                     ),
                   ],
                 ),

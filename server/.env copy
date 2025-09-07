@@ -1,0 +1,5 @@
+MONGO_DB_URL = "Mongodb URL here"
+JWT_SECRET = "test123"
+RECEIVERS = receiver1 receiver2
+END_USERS = endUser1 endUser2
+DEFAULT_PASSWORD = "password123"

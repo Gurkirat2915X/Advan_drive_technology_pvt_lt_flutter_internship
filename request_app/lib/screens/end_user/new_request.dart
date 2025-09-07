@@ -17,6 +17,8 @@ class NewRequestScreen extends ConsumerWidget {
       final itemTypes = ref.watch(itemTypesProvider);
       final user = ref.watch(authProvider);
       final isConnected = ref.watch(networkProvider);
+      final theme = Theme.of(context);
+      final colorScheme = theme.colorScheme;
 
       final _formKey = GlobalKey<FormState>();
       final _nameController = TextEditingController();
@@ -42,8 +44,8 @@ class NewRequestScreen extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('New Request'),
-        backgroundColor: isConnected ? null : Colors.red.shade700,
-        foregroundColor: isConnected ? null : Colors.white,
+        backgroundColor: isConnected ? null : colorScheme.error,
+        foregroundColor: isConnected ? null : colorScheme.onError,
       ),
       body: Column(
         children: [
@@ -51,17 +53,22 @@ class NewRequestScreen extends ConsumerWidget {
           if (!isConnected)
             Container(
               width: double.infinity,
-              padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-              color: Colors.red.shade100,
+              padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 16.0),
+              decoration: BoxDecoration(
+                color: colorScheme.error.withOpacity(0.1),
+                border: Border(
+                  bottom: BorderSide(color: colorScheme.error.withOpacity(0.2)),
+                ),
+              ),
               child: Row(
                 children: [
-                  Icon(Icons.wifi_off, color: Colors.red.shade700, size: 20),
+                  Icon(Icons.wifi_off, color: colorScheme.error, size: 20),
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
                       'No internet connection. Please check your network.',
                       style: TextStyle(
-                        color: Colors.red.shade700,
+                        color: colorScheme.error,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
@@ -165,9 +172,10 @@ class NewRequestScreen extends ConsumerWidget {
                       onPressed: () async{
                         if (!isConnected) {
                           ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('No internet connection. Please check your network and try again.'),
-                              backgroundColor: Colors.red,
+                            SnackBar(
+                              content: const Text('No internet connection. Please check your network and try again.'),
+                              backgroundColor: colorScheme.error,
+                              behavior: SnackBarBehavior.floating,
                             ),
                           );
                           return;
@@ -205,13 +213,11 @@ class NewRequestScreen extends ConsumerWidget {
                         }
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: isConnected ? null : Colors.grey,
+                        backgroundColor: isConnected ? null : colorScheme.surfaceVariant,
+                        foregroundColor: isConnected ? null : colorScheme.onSurfaceVariant,
                       ),
                       child: Text(
                         isConnected ? 'Submit Request' : 'No Internet Connection',
-                        style: TextStyle(
-                          color: isConnected ? null : Colors.white70,
-                        ),
                       ),
                     ),
                   ],

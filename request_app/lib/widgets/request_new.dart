@@ -4,7 +4,6 @@ import 'package:request_app/models/user.dart';
 import 'package:request_app/providers/auth_provider.dart';
 import 'package:request_app/providers/requests_provider.dart';
 import 'package:request_app/screens/end_user/new_request.dart';
-import 'package:request_app/screens/end_user/request_detail.dart';
 import 'package:request_app/screens/receiver/request_approval.dart';
 import 'package:request_app/theme.dart';
 
@@ -16,16 +15,7 @@ class Requests extends ConsumerWidget {
     final User user = ref.watch(authProvider);
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    final allRequests = ref.watch(requestsProvider);
-    
-    // Filter requests based on user role
-    final requests = user.role == "end_user" 
-        ? allRequests.where((request) => 
-            request.userId == user.id && 
-            request.status.toLowerCase() != 'approved' &&
-            request.status.toLowerCase() != 'completed'
-          ).toList()
-        : allRequests;
+    final requests = ref.watch(requestsProvider);
     
     return Padding(
       padding: const EdgeInsets.all(16.0),
@@ -57,16 +47,14 @@ class Requests extends ConsumerWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        user.role == "end_user" ? 'My Active Requests' : 'All Requests',
+                        'Requests',
                         style: theme.textTheme.headlineSmall?.copyWith(
                           fontWeight: FontWeight.bold,
                           color: colorScheme.onSurface,
                         ),
                       ),
                       Text(
-                        user.role == "end_user" 
-                            ? 'Track your pending and in-progress requests' 
-                            : 'Review and manage all requests',
+                        user.role == "end_user" ? 'Manage your requests' : 'Review and approve requests',
                         style: theme.textTheme.bodyMedium?.copyWith(
                           color: colorScheme.onSurface.withOpacity(0.7),
                         ),
@@ -137,7 +125,7 @@ class Requests extends ConsumerWidget {
           ),
           const SizedBox(height: 16),
           Text(
-            userRole == "end_user" ? 'No active requests' : 'No requests to review',
+            userRole == "end_user" ? 'No requests yet' : 'No requests to review',
             style: theme.textTheme.headlineSmall?.copyWith(
               color: colorScheme.onSurface.withOpacity(0.7),
             ),
@@ -145,7 +133,7 @@ class Requests extends ConsumerWidget {
           const SizedBox(height: 8),
           Text(
             userRole == "end_user" 
-                ? 'Create a new request or check the Completed tab for approved requests'
+                ? 'Create your first request to get started'
                 : 'New requests will appear here for review',
             style: theme.textTheme.bodyMedium?.copyWith(
               color: colorScheme.onSurface.withOpacity(0.5),
@@ -161,69 +149,35 @@ class Requests extends ConsumerWidget {
       dynamic request, String userRole, WidgetRef ref) {
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
-      elevation: 2,
-      shadowColor: colorScheme.shadow.withOpacity(0.1),
       child: InkWell(
         borderRadius: BorderRadius.circular(12),
-        splashColor: colorScheme.primary.withOpacity(0.1),
-        highlightColor: colorScheme.primary.withOpacity(0.05),
-        onTap: () {
-          if (userRole == "receiver") {
-            Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (context) => RequestApprovalScreen(request: request),
-              ),
-            );
-          } else if (userRole == "end_user") {
-            Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (context) => RequestDetailScreen(request: request),
-              ),
-            );
-          }
-        },
-        child: Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(
-              color: colorScheme.outline.withOpacity(0.2),
-              width: 1,
+        onTap: userRole == "receiver" ? () {
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) => RequestApprovalScreen(request: request),
             ),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Header Row with clickable indicator
-                Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        request.name ?? 'Unnamed Request',
-                        style: theme.textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.w600,
-                        ),
+          );
+        } : null,
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Header Row
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      request.name ?? 'Unnamed Request',
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
-                    _buildStatusChip(theme, colorScheme, request.status),
-                    const SizedBox(width: 8),
-                    // Clickable indicator icon
-                    Container(
-                      padding: const EdgeInsets.all(4),
-                      decoration: BoxDecoration(
-                        color: colorScheme.primary.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(6),
-                      ),
-                      child: Icon(
-                        Icons.arrow_forward_ios,
-                        size: 12,
-                        color: colorScheme.primary,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 12),
+                  ),
+                  _buildStatusChip(theme, colorScheme, request.status),
+                ],
+              ),
+              const SizedBox(height: 12),
               
               // Items Count
               Row(
@@ -277,27 +231,7 @@ class Requests extends ConsumerWidget {
                   ],
                 ),
               ],
-              if (userRole == "end_user") ...[
-                const SizedBox(height: 12),
-                Row(
-                  children: [
-                    Icon(
-                      Icons.info_outline,
-                      size: 16,
-                      color: colorScheme.primary,
-                    ),
-                    const SizedBox(width: 4),
-                    Text(
-                      'Tap to view details',
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        color: colorScheme.primary,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ]),
+            ],
           ),
         ),
       ),
