@@ -12,41 +12,48 @@ class NetworkStatusWidget extends ConsumerWidget {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
-    return Stack(
+    if (isConnected) {
+      return child;
+    }
+
+    return Column(
       children: [
-        child,
-        if (!isConnected)
-          Positioned(
-            top: 0,
-            left: 0,
-            right: 0,
-            child: Container(
-              decoration: BoxDecoration(
-                color: colorScheme.error,
-                boxShadow: [
-                  BoxShadow(
-                    color: colorScheme.shadow.withOpacity(0.1),
-                    blurRadius: 4,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
+        Container(
+          width: double.infinity,
+          decoration: BoxDecoration(
+            color: colorScheme.error,
+            boxShadow: [
+              BoxShadow(
+                color: colorScheme.shadow.withOpacity(0.1),
+                blurRadius: 4,
+                offset: const Offset(0, 2),
               ),
-              padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-              child: SafeArea(
-                bottom: false,
-                child: Row(
-                  children: [
-                    Icon(Icons.wifi_off, color: colorScheme.onError, size: 16),
-                    const SizedBox(width: 8),
-                    Text(
-                      'No Internet Connection',
-                      style: TextStyle(color: colorScheme.onError, fontSize: 14),
-                    ),
-                  ],
+            ],
+          ),
+          padding: EdgeInsets.only(
+            top: MediaQuery.of(context).padding.top + 8,
+            bottom: 8,
+            left: 16,
+            right: 16,
+          ),
+          child: Row(
+            children: [
+              Icon(Icons.wifi_off, color: colorScheme.onError, size: 16),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  'No Internet Connection',
+                  style: TextStyle(
+                    color: colorScheme.onError, 
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
               ),
-            ),
+            ],
           ),
+        ),
+        Expanded(child: child),
       ],
     );
   }

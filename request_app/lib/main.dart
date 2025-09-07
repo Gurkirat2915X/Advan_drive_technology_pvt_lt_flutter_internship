@@ -7,7 +7,6 @@ import 'package:request_app/screens/login.dart';
 import 'package:request_app/screens/receiver/tabs.dart';
 import 'package:request_app/screens/splash.dart';
 import 'package:request_app/services/socket.dart';
-import 'package:request_app/widgets/network_status_widget.dart';
 import 'package:request_app/theme.dart';
 
 void main() {
@@ -27,7 +26,6 @@ class _MyAppState extends ConsumerState<MyApp> {
   @override
   void initState() {
     super.initState();
-    // Initialize auth data after the widget tree is built
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!_isInitialized) {
         ref.read(authProvider.notifier).loadUserData(ref);
@@ -47,8 +45,6 @@ class _MyAppState extends ConsumerState<MyApp> {
         builder: (context, ref, child) {
           final user = ref.watch(authProvider);
           ref.watch(networkProvider);
-          
-          // Show splash screen while loading authentication state
           if (user.isLoading) {
             return const SplashScreen();
           }
@@ -64,7 +60,7 @@ class _MyAppState extends ConsumerState<MyApp> {
             mainContent = const LoginScreen();
           }
           
-          return NetworkStatusWidget(child: mainContent);
+          return mainContent;
         },
       ),
     );
