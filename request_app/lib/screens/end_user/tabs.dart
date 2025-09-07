@@ -12,13 +12,12 @@ class EndUserTabs extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // Ensure socket service has the latest ref to prevent expiration issues
     SocketService().setRef(ref);
-    
+
     final isConnected = ref.watch(networkProvider);
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    
+
     return DefaultTabController(
       length: 2,
       child: Scaffold(
@@ -52,24 +51,37 @@ class EndUserTabs extends ConsumerWidget {
                 ),
               ),
               const Spacer(),
-              // Network status indicator
+
               if (!isConnected)
                 Container(
                   margin: const EdgeInsets.only(right: 8),
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
                   decoration: BoxDecoration(
                     color: colorScheme.onPrimary.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: colorScheme.onPrimary.withOpacity(0.3)),
+                    border: Border.all(
+                      color: colorScheme.onPrimary.withOpacity(0.3),
+                    ),
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Icon(Icons.wifi_off, color: colorScheme.onPrimary, size: 14),
+                      Icon(
+                        Icons.wifi_off,
+                        color: colorScheme.onPrimary,
+                        size: 14,
+                      ),
                       const SizedBox(width: 4),
                       Text(
                         'Offline',
-                        style: TextStyle(color: colorScheme.onPrimary, fontSize: 12, fontWeight: FontWeight.w500),
+                        style: TextStyle(
+                          color: colorScheme.onPrimary,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
                     ],
                   ),
@@ -78,7 +90,11 @@ class EndUserTabs extends ConsumerWidget {
                 icon: Icon(Icons.logout, color: colorScheme.onPrimary),
                 onPressed: () {
                   ref.read(authProvider.notifier).logout();
-                  Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => const LoginScreen()));
+                  Navigator.of(context).pushReplacement(
+                    MaterialPageRoute(
+                      builder: (context) => const LoginScreen(),
+                    ),
+                  );
                 },
               ),
             ],
@@ -88,23 +104,22 @@ class EndUserTabs extends ConsumerWidget {
             indicatorWeight: 3,
             labelColor: colorScheme.onPrimary,
             unselectedLabelColor: colorScheme.onPrimary.withOpacity(0.7),
-            labelStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 12),
-            unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.w400, fontSize: 12),
+            labelStyle: const TextStyle(
+              fontWeight: FontWeight.w600,
+              fontSize: 12,
+            ),
+            unselectedLabelStyle: const TextStyle(
+              fontWeight: FontWeight.w400,
+              fontSize: 12,
+            ),
             tabs: const [
-              Tab(
-                icon: Icon(Icons.list_alt),
-                text: 'Active Requests',
-              ),
-              Tab(
-                icon: Icon(Icons.check_circle_outline),
-                text: 'Completed',
-              ),
+              Tab(icon: Icon(Icons.list_alt), text: 'Active Requests'),
+              Tab(icon: Icon(Icons.check_circle_outline), text: 'Completed'),
             ],
           ),
         ),
         body: Column(
           children: [
-            // Network status banner at the top
             if (!isConnected)
               Container(
                 decoration: BoxDecoration(
@@ -117,7 +132,10 @@ class EndUserTabs extends ConsumerWidget {
                     ),
                   ],
                 ),
-                padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                padding: const EdgeInsets.symmetric(
+                  vertical: 8,
+                  horizontal: 16,
+                ),
                 child: Row(
                   children: [
                     Icon(Icons.wifi_off, color: colorScheme.onError, size: 16),
@@ -125,22 +143,20 @@ class EndUserTabs extends ConsumerWidget {
                     Expanded(
                       child: Text(
                         'No Internet Connection - Data may not be up to date',
-                        style: TextStyle(color: colorScheme.onError, fontSize: 14),
+                        style: TextStyle(
+                          color: colorScheme.onError,
+                          fontSize: 14,
+                        ),
                       ),
                     ),
                   ],
                 ),
               ),
-            // Tab content with proper background
+
             Expanded(
               child: Container(
                 color: colorScheme.surface,
-                child: TabBarView(
-                  children: [
-                    Requests(),
-                    CompletedRequest(),
-                  ],
-                ),
+                child: TabBarView(children: [Requests(), CompletedRequest()]),
               ),
             ),
           ],

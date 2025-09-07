@@ -3,7 +3,6 @@ import 'package:request_app/models/user.dart';
 import 'package:request_app/providers/auth_provider.dart';
 import 'package:request_app/services/api.dart';
 
-
 class ReceiversProvider extends StateNotifier<List<Map<String, String>>> {
   ReceiversProvider() : super([]);
 
@@ -23,6 +22,7 @@ class ReceiversProvider extends StateNotifier<List<Map<String, String>>> {
   }
 }
 
-final receiversProvider = StateNotifierProvider<ReceiversProvider, List<Map<String, String>>>(
-  (ref) => ReceiversProvider(),
-);
+final receiversProvider =
+    StateNotifierProvider<ReceiversProvider, List<Map<String, String>>>(
+      (ref) => ReceiversProvider(),
+    );

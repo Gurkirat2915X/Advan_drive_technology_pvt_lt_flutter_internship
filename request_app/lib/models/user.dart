@@ -4,7 +4,7 @@ class User {
   final String role;
   final String token;
   final bool isLoading;
-  
+
   User({
     required this.id,
     required this.username,
@@ -16,17 +16,17 @@ class User {
   factory User.empty() {
     return User(id: '', username: '', role: '', token: '');
   }
-  
+
   factory User.loading() {
     return User(id: '', username: '', role: '', token: '', isLoading: true);
   }
-  
+
   factory User.fromJson(Map<String, dynamic> json) {
     return User(
       id: json['user']['id'] ?? json['user']['_id'] ?? '',
       username: json['user']['username'] ?? '',
       role: json['user']['role'] ?? '',
-      token: json['token'] ?? ''
+      token: json['token'] ?? '',
     );
   }
 
@@ -52,6 +52,10 @@ class User {
 
   @override
   int get hashCode {
-    return id.hashCode ^ username.hashCode ^ role.hashCode ^ token.hashCode ^ isLoading.hashCode;
+    return id.hashCode ^
+        username.hashCode ^
+        role.hashCode ^
+        token.hashCode ^
+        isLoading.hashCode;
   }
 }

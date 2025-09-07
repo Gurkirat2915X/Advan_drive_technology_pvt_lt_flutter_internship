@@ -23,23 +23,33 @@ class RequestsProvider extends StateNotifier<List<Request>> {
   }
 
   Future<void> updateRequest(User user, Request request) async {
-    try{
+    try {
       final updatedRequest = await api.updateRequest(user, request);
-      // Update the request in the state
-      state = state.map((r) => r.id == request.id ? updatedRequest : r).toList();
-    } catch (error){
-      print("Failed to update Req: $error" );
+      state = state
+          .map((r) => r.id == request.id ? updatedRequest : r)
+          .toList();
+    } catch (error) {
+      print("Failed to update Req: $error");
       throw Exception("Failed to update");
     }
   }
 
-  Future<void> updateRequestWithReassignments(User user, Request request, List<Map<String, dynamic>> itemStates) async {
-    try{
-      final updatedRequest = await api.updateRequestWithReassignments(user, request, itemStates);
-      // Update the request in the state
-      state = state.map((r) => r.id == request.id ? updatedRequest : r).toList();
-    } catch (error){
-      print("Failed to update Req: $error" );
+  Future<void> updateRequestWithReassignments(
+    User user,
+    Request request,
+    List<Map<String, dynamic>> itemStates,
+  ) async {
+    try {
+      final updatedRequest = await api.updateRequestWithReassignments(
+        user,
+        request,
+        itemStates,
+      );
+      state = state
+          .map((r) => r.id == request.id ? updatedRequest : r)
+          .toList();
+    } catch (error) {
+      print("Failed to update Req: $error");
       throw Exception("Failed to update");
     }
   }

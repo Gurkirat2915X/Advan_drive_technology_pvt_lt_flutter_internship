@@ -4,6 +4,7 @@ import 'package:request_app/providers/auth_provider.dart';
 import 'package:request_app/providers/network_provider.dart';
 import 'package:request_app/providers/reassigned_provider.dart';
 import 'package:request_app/models/item.dart';
+import 'package:request_app/services/socket.dart';
 import 'package:request_app/widgets/network_status_widget.dart';
 
 class ReassignedScreen extends ConsumerStatefulWidget {
@@ -28,13 +29,12 @@ class _ReassignedScreenState extends ConsumerState<ReassignedScreen> {
     });
     try {
       final user = ref.read(authProvider);
-      
-      // Check network connectivity before making API call
+
       final isConnected = ref.read(networkProvider);
       if (!isConnected) {
         throw Exception('No internet connection');
       }
-      
+
       await ref.read(reassignedProvider.notifier).loadReassigned(user, ref);
     } catch (error) {
       if (mounted) {
@@ -53,6 +53,8 @@ class _ReassignedScreenState extends ConsumerState<ReassignedScreen> {
 
   @override
   Widget build(BuildContext context) {
+    SocketService().setRef(ref);
+
     final reassignedItems = ref.watch(reassignedProvider);
     final isConnected = ref.watch(networkProvider);
 
@@ -60,25 +62,23 @@ class _ReassignedScreenState extends ConsumerState<ReassignedScreen> {
       return const Center(child: CircularProgressIndicator());
     }
 
-    // Show network-aware content
     return NetworkAwareWidget(
       onRetry: _loadReassignedItems,
       child: _buildContent(context, reassignedItems, isConnected),
     );
   }
 
-  Widget _buildContent(BuildContext context, List<Item> reassignedItems, bool isConnected) {
-
+  Widget _buildContent(
+    BuildContext context,
+    List<Item> reassignedItems,
+    bool isConnected,
+  ) {
     if (reassignedItems.isEmpty) {
       return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              Icons.assignment_return,
-              size: 64,
-              color: Colors.grey,
-            ),
+            Icon(Icons.assignment_return, size: 64, color: Colors.grey),
             const SizedBox(height: 16),
             Text(
               'No Reassigned Items',
@@ -137,7 +137,7 @@ class _ReassignedScreenState extends ConsumerState<ReassignedScreen> {
 
   Widget _buildItemCard(BuildContext context, Item item) {
     final theme = Theme.of(context);
-    
+
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
       elevation: 2,
@@ -146,7 +146,6 @@ class _ReassignedScreenState extends ConsumerState<ReassignedScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Header with item name and status
             Row(
               children: [
                 Expanded(
@@ -158,7 +157,10 @@ class _ReassignedScreenState extends ConsumerState<ReassignedScreen> {
                   ),
                 ),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
                   decoration: BoxDecoration(
                     color: Colors.orange.shade100,
                     borderRadius: BorderRadius.circular(12),
@@ -166,7 +168,11 @@ class _ReassignedScreenState extends ConsumerState<ReassignedScreen> {
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Icon(Icons.assignment_return, size: 14, color: Colors.orange.shade700),
+                      Icon(
+                        Icons.assignment_return,
+                        size: 14,
+                        color: Colors.orange.shade700,
+                      ),
                       const SizedBox(width: 4),
                       Text(
                         'REASSIGNED',
@@ -182,8 +188,7 @@ class _ReassignedScreenState extends ConsumerState<ReassignedScreen> {
               ],
             ),
             const SizedBox(height: 12),
-            
-            // Item details
+
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
@@ -195,7 +200,11 @@ class _ReassignedScreenState extends ConsumerState<ReassignedScreen> {
                 children: [
                   Row(
                     children: [
-                      Icon(Icons.category, size: 16, color: theme.colorScheme.primary),
+                      Icon(
+                        Icons.category,
+                        size: 16,
+                        color: theme.colorScheme.primary,
+                      ),
                       const SizedBox(width: 8),
                       Text(
                         'Type: ${item.type}',
@@ -206,7 +215,11 @@ class _ReassignedScreenState extends ConsumerState<ReassignedScreen> {
                   const SizedBox(height: 8),
                   Row(
                     children: [
-                      Icon(Icons.numbers, size: 16, color: theme.colorScheme.primary),
+                      Icon(
+                        Icons.numbers,
+                        size: 16,
+                        color: theme.colorScheme.primary,
+                      ),
                       const SizedBox(width: 8),
                       Text(
                         'Quantity: ${item.quantity}',
@@ -218,7 +231,11 @@ class _ReassignedScreenState extends ConsumerState<ReassignedScreen> {
                     const SizedBox(height: 8),
                     Row(
                       children: [
-                        Icon(Icons.folder, size: 16, color: theme.colorScheme.primary),
+                        Icon(
+                          Icons.folder,
+                          size: 16,
+                          color: theme.colorScheme.primary,
+                        ),
                         const SizedBox(width: 8),
                         Expanded(
                           child: Text(
@@ -233,7 +250,11 @@ class _ReassignedScreenState extends ConsumerState<ReassignedScreen> {
                     const SizedBox(height: 8),
                     Row(
                       children: [
-                        Icon(Icons.person, size: 16, color: theme.colorScheme.secondary),
+                        Icon(
+                          Icons.person,
+                          size: 16,
+                          color: theme.colorScheme.secondary,
+                        ),
                         const SizedBox(width: 8),
                         Expanded(
                           child: Text(
@@ -249,8 +270,7 @@ class _ReassignedScreenState extends ConsumerState<ReassignedScreen> {
                 ],
               ),
             ),
-            
-            // Notes section if available
+
             if (item.notes != null && item.notes!.isNotEmpty) ...[
               const SizedBox(height: 12),
               Container(
@@ -288,10 +308,9 @@ class _ReassignedScreenState extends ConsumerState<ReassignedScreen> {
                 ),
               ),
             ],
-            
+
             const SizedBox(height: 12),
-            
-            // Action buttons
+
             Row(
               children: [
                 Expanded(
@@ -326,7 +345,6 @@ class _ReassignedScreenState extends ConsumerState<ReassignedScreen> {
   }
 
   void _acceptReassignment(Item item) async {
-    // Check network before attempting action
     final isConnected = ref.read(networkProvider);
     if (!isConnected) {
       if (mounted) {
@@ -342,8 +360,10 @@ class _ReassignedScreenState extends ConsumerState<ReassignedScreen> {
 
     try {
       final user = ref.read(authProvider);
-      await ref.read(reassignedProvider.notifier).acceptReassignment(user, item.id);
-      
+      await ref
+          .read(reassignedProvider.notifier)
+          .acceptReassignment(user, item.id);
+
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -365,7 +385,6 @@ class _ReassignedScreenState extends ConsumerState<ReassignedScreen> {
   }
 
   void _rejectReassignment(Item item) async {
-    // Check network before attempting action
     final isConnected = ref.read(networkProvider);
     if (!isConnected) {
       if (mounted) {
@@ -381,8 +400,10 @@ class _ReassignedScreenState extends ConsumerState<ReassignedScreen> {
 
     try {
       final user = ref.read(authProvider);
-      await ref.read(reassignedProvider.notifier).rejectReassignment(user, item.id);
-      
+      await ref
+          .read(reassignedProvider.notifier)
+          .rejectReassignment(user, item.id);
+
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(

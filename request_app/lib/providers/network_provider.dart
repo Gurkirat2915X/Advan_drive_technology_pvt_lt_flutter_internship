@@ -11,8 +11,7 @@ class NetworkProvider extends StateNotifier<bool> {
   Future<void> _initialize() async {
     await _networkService.initialize();
     state = _networkService.isConnected;
-    
-    // Listen to connectivity changes
+
     _networkService.connectionStream.listen((isConnected) {
       state = isConnected;
     });

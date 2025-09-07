@@ -11,9 +11,8 @@ class AuthProvider extends StateNotifier<User> {
   AuthProvider() : super(User.loading());
 
   void loadUserData(WidgetRef ref) async {
-    // Start with loading state
     state = User.loading();
-    
+
     User loadedUser = await loadUserFromStorage();
     if (loadedUser.token.isNotEmpty) {
       bool valid = await isLoggedIn(loadedUser);
@@ -40,10 +39,12 @@ class AuthProvider extends StateNotifier<User> {
         } catch (e) {
           print('Failed to load item types: $e');
         }
-        if(loadedUser.role == 'receiver'){
+        if (loadedUser.role == 'receiver') {
           print("receiver");
           try {
-            await ref.read(reassignedProvider.notifier).loadReassigned(loadedUser, ref);
+            await ref
+                .read(reassignedProvider.notifier)
+                .loadReassigned(loadedUser, ref);
           } catch (e) {
             print('Failed to load receiver profile: $e');
           }
@@ -54,7 +55,6 @@ class AuthProvider extends StateNotifier<User> {
         await clearUserFromStorage();
       }
     } else {
-      // No stored user, set to empty (not loading)
       state = User.empty();
     }
   }

@@ -8,14 +8,12 @@ const CONNECTION_OPTIONS = {
 };
 
 const MAX_RETRIES = 3;
-const RETRY_INTERVAL = 5000; // 5 seconds
+const RETRY_INTERVAL = 5000; 
 
 async function ConnectDBWithRetry(retryCount = 0) {
   try {
     await mongoose.connect(process.env.MONGO_DB_URL, CONNECTION_OPTIONS);
     console.log("✅ Database connected successfully");
-
-    // Add connection event listeners
     mongoose.connection.on("error", (err) => {
       console.error("❌ MongoDB connection error:", err);
     });

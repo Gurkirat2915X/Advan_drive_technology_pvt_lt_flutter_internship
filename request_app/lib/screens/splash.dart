@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:request_app/providers/network_provider.dart';
+import 'package:request_app/services/socket.dart';
 
 class SplashScreen extends ConsumerWidget {
   const SplashScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    SocketService().setRef(ref);
+
     final isConnected = ref.watch(networkProvider);
-    
+
     return Scaffold(
       body: Center(
         child: Column(
@@ -18,15 +21,15 @@ class SplashScreen extends ConsumerWidget {
             const SizedBox(height: 24),
             const Text(
               'Loading...',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
-              ),
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
             ),
             const SizedBox(height: 16),
             if (!isConnected)
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 8,
+                ),
                 margin: const EdgeInsets.symmetric(horizontal: 32),
                 decoration: BoxDecoration(
                   color: Colors.orange.shade100,

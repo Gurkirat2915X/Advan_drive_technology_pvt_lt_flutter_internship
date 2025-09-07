@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:request_app/providers/requests_provider.dart';
 import 'package:request_app/providers/auth_provider.dart';
 import 'package:request_app/screens/end_user/request_detail.dart';
+import 'package:request_app/services/socket.dart';
 import 'package:request_app/theme.dart';
 
 class CompletedRequest extends ConsumerWidget {
@@ -10,23 +11,22 @@ class CompletedRequest extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    SocketService().setRef(ref);
+
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final allRequests = ref.watch(requestsProvider);
     final user = ref.watch(authProvider);
 
-    // Filter completed/approved requests based on user role
     final completedRequests = allRequests.where((request) {
       final isCompleted =
           request.status.toLowerCase() == 'approved' ||
           request.status.toLowerCase() == 'completed';
 
-      // For end users, only show their own completed requests
       if (user?.role.toLowerCase() == 'enduser') {
         return isCompleted && request.userId == user.id;
       }
 
-      // For receivers, show all completed requests they handled
       return isCompleted;
     }).toList();
 
@@ -37,7 +37,6 @@ class CompletedRequest extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Header
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
@@ -81,7 +80,6 @@ class CompletedRequest extends ConsumerWidget {
             ),
             const SizedBox(height: 16),
 
-            // Content
             Expanded(
               child: completedRequests.isEmpty
                   ? _buildEmptyState(
@@ -236,7 +234,7 @@ class CompletedRequest extends ConsumerWidget {
                         ),
                       ),
                       const SizedBox(width: 8),
-                      // Clickable indicator icon
+
                       Container(
                         padding: const EdgeInsets.all(4),
                         decoration: BoxDecoration(

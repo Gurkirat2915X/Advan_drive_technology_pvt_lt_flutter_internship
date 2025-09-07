@@ -17,16 +17,11 @@ function calculateRequestStatus(items) {
   ).length;
   const totalCount = itemStatuses.length;
 
-  // All items fulfilled
   if (fulfilledCount === totalCount) {
     return "approved";
-  }
-  // At least one item fulfilled
-  else if (fulfilledCount > 0) {
+  } else if (fulfilledCount > 0) {
     return "partially_fulfilled";
-  }
-  // No items fulfilled
-  else {
+  } else {
     return "pending";
   }
 }
@@ -39,7 +34,6 @@ async function handleItemReassignment(
   reason = ""
 ) {
   try {
-    // Update item status to reassigned, set reassignedTo and save notes
     await Item.findByIdAndUpdate(itemId, {
       status: "reassigned",
       reassignedTo: newReceiverId,
@@ -70,7 +64,7 @@ requestRouter.get("/all", async (req, res) => {
     if (req.user.role == "receiver") {
       const requests = await Request.find({ receiver: req.user._id })
         .populate("items")
-        .sort({ createdAt: -1 }); // Sort by creation date, newest first
+        .sort({ createdAt: -1 });
 
       console.log(
         `Receiver ${req.user._id} found ${requests.length} original requests`
@@ -83,7 +77,7 @@ requestRouter.get("/all", async (req, res) => {
     } else {
       allRequests = await Request.find({ user: req.user._id })
         .populate("items")
-        .sort({ createdAt: -1 }); // Sort by creation date, newest first
+        .sort({ createdAt: -1 });
       console.log(
         `End user ${req.user._id} found ${allRequests.length} requests`
       );
@@ -212,17 +206,13 @@ requestRouter.post("/update", async (req, res) => {
           );
 
           if (currentItem) {
-            // Check if item is being reassigned
             if (itemData.status === "reassigned" && itemData.reassignedTo) {
-              // Validate new receiver
               const newReceiver = await User.findById(itemData.reassignedTo);
               if (!newReceiver || newReceiver.role !== "receiver") {
                 return res.status(400).json({
                   message: `Invalid receiver for item reassignment: ${itemData.id}`,
                 });
               }
-
-              // Handle reassignment
               await handleItemReassignment(
                 itemData.id,
                 itemData.reassignedTo,
@@ -231,7 +221,6 @@ requestRouter.post("/update", async (req, res) => {
                 itemData.reassignmentReason || ""
               );
             } else {
-              // Update existing item with new status
               await Item.findByIdAndUpdate(itemData.id, {
                 name: itemData.name || currentItem.name,
                 type: itemData.type || currentItem.type,
@@ -241,7 +230,6 @@ requestRouter.post("/update", async (req, res) => {
             }
           }
         } else if (itemData.name && itemData.type && itemData.quantity) {
-          // Create new item if no ID provided
           const newItem = await Item.create({
             name: itemData.name,
             type: itemData.type,
@@ -253,13 +241,11 @@ requestRouter.post("/update", async (req, res) => {
       }
     }
 
-    // Get updated items to calculate new request status
     const updatedRequest = await Request.findById(id).populate("items");
     const newRequestStatus = calculateRequestStatus(updatedRequest.items);
 
-    // Update request fields
     const updateData = {
-      status: newRequestStatus, // Automatically calculated status
+      status: newRequestStatus,
     };
 
     if (name) updateData.name = name;

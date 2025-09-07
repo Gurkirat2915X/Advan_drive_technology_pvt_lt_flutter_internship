@@ -48,10 +48,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
       if (success && mounted) {
         final user = ref.read(authProvider);
-        
-        // Initialize socket service with ref after successful login
+
         SocketService().setRef(ref);
-        
+
         if (user.role == 'receiver') {
           Navigator.of(context).pushReplacement(
             MaterialPageRoute(builder: (context) => const ReceiverTabs()),
@@ -84,9 +83,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // Ensure socket service has the latest ref to prevent expiration issues
     SocketService().setRef(ref);
-    
+
     final isConnected = ref.watch(networkProvider);
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
@@ -94,7 +92,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     return Scaffold(
       body: Column(
         children: [
-          // Network status banner at the top
           if (!isConnected)
             Container(
               width: double.infinity,
@@ -131,7 +128,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 ],
               ),
             ),
-          // Main login content
+
           Expanded(
             child: Container(
               decoration: BoxDecoration(
@@ -162,7 +159,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             mainAxisSize: MainAxisSize.min,
                             crossAxisAlignment: CrossAxisAlignment.stretch,
                             children: [
-                              // Logo/Icon
                               Container(
                                 padding: const EdgeInsets.all(16),
                                 decoration: BoxDecoration(
@@ -177,7 +173,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                               ),
                               const SizedBox(height: 24),
 
-                              // Title
                               Text(
                                 'Request Workflow',
                                 textAlign: TextAlign.center,
@@ -188,7 +183,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                               ),
                               const SizedBox(height: 8),
 
-                              // Subtitle
                               Text(
                                 'Sign in to manage your requests',
                                 textAlign: TextAlign.center,
@@ -198,7 +192,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                               ),
                               const SizedBox(height: 32),
 
-                              // Error Message
                               if (_errorMessage != null)
                                 Container(
                                   padding: const EdgeInsets.all(12),
@@ -231,7 +224,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                   ),
                                 ),
 
-                              // Username Field
                               TextFormField(
                                 controller: _usernameController,
                                 decoration: InputDecoration(
@@ -250,7 +242,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                               ),
                               const SizedBox(height: 16),
 
-                              // Password Field
                               TextFormField(
                                 controller: _passwordController,
                                 obscureText: _obscurePassword,
@@ -283,7 +274,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                               ),
                               const SizedBox(height: 24),
 
-                              // Login Button
                               SizedBox(
                                 height: 48,
                                 child: ElevatedButton(
@@ -305,7 +295,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                               ),
                               const SizedBox(height: 24),
 
-                              // Demo Credentials Section
                               Container(
                                 padding: const EdgeInsets.all(16),
                                 decoration: BoxDecoration(

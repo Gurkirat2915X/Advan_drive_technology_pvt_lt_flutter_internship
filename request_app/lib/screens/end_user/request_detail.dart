@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:request_app/models/request.dart';
+import 'package:request_app/services/socket.dart';
 import 'package:request_app/theme.dart';
 
 class RequestDetailScreen extends ConsumerWidget {
@@ -10,9 +11,11 @@ class RequestDetailScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    SocketService().setRef(ref);
+
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    
+
     return Scaffold(
       backgroundColor: colorScheme.surface,
       appBar: AppBar(
@@ -39,7 +42,6 @@ class RequestDetailScreen extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Request Status Header
             Container(
               width: double.infinity,
               padding: const EdgeInsets.all(16),
@@ -83,27 +85,40 @@ class RequestDetailScreen extends ConsumerWidget {
                 ],
               ),
             ),
-            
+
             const SizedBox(height: 24),
-            
-            // Request Information
+
             _buildInfoSection(
               'Request Information',
               Icons.info_outline,
               [
                 _buildInfoRow('Request ID', request.id, colorScheme, theme),
-                _buildInfoRow('Status', request.status.toUpperCase(), colorScheme, theme),
-                _buildInfoRow('Created', _formatDate(request.createdAt), colorScheme, theme),
+                _buildInfoRow(
+                  'Status',
+                  request.status.toUpperCase(),
+                  colorScheme,
+                  theme,
+                ),
+                _buildInfoRow(
+                  'Created',
+                  _formatDate(request.createdAt),
+                  colorScheme,
+                  theme,
+                ),
                 _buildInfoRow('User ID', request.userId, colorScheme, theme),
-                _buildInfoRow('Receiver ID', request.receiverId, colorScheme, theme),
+                _buildInfoRow(
+                  'Receiver ID',
+                  request.receiverId,
+                  colorScheme,
+                  theme,
+                ),
               ],
               colorScheme,
               theme,
             ),
-            
+
             const SizedBox(height: 24),
-            
-            // Items Section
+
             _buildItemsSection(colorScheme, theme),
           ],
         ),
@@ -111,7 +126,13 @@ class RequestDetailScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildInfoSection(String title, IconData icon, List<Widget> children, ColorScheme colorScheme, ThemeData theme) {
+  Widget _buildInfoSection(
+    String title,
+    IconData icon,
+    List<Widget> children,
+    ColorScheme colorScheme,
+    ThemeData theme,
+  ) {
     return Container(
       decoration: BoxDecoration(
         color: colorScheme.surfaceContainerHighest,
@@ -132,11 +153,7 @@ class RequestDetailScreen extends ConsumerWidget {
             ),
             child: Row(
               children: [
-                Icon(
-                  icon,
-                  color: colorScheme.onPrimaryContainer,
-                  size: 20,
-                ),
+                Icon(icon, color: colorScheme.onPrimaryContainer, size: 20),
                 const SizedBox(width: 8),
                 Text(
                   title,
@@ -150,16 +167,19 @@ class RequestDetailScreen extends ConsumerWidget {
           ),
           Padding(
             padding: const EdgeInsets.all(16),
-            child: Column(
-              children: children,
-            ),
+            child: Column(children: children),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildInfoRow(String label, String value, ColorScheme colorScheme, ThemeData theme) {
+  Widget _buildInfoRow(
+    String label,
+    String value,
+    ColorScheme colorScheme,
+    ThemeData theme,
+  ) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: Row(
@@ -254,7 +274,8 @@ class RequestDetailScreen extends ConsumerWidget {
                   physics: const NeverScrollableScrollPhysics(),
                   padding: const EdgeInsets.all(16),
                   itemCount: request.items.length,
-                  separatorBuilder: (context, index) => const SizedBox(height: 12),
+                  separatorBuilder: (context, index) =>
+                      const SizedBox(height: 12),
                   itemBuilder: (context, index) {
                     final item = request.items[index];
                     return _buildItemCard(item, index, colorScheme, theme);
@@ -265,7 +286,12 @@ class RequestDetailScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildItemCard(dynamic item, int index, ColorScheme colorScheme, ThemeData theme) {
+  Widget _buildItemCard(
+    dynamic item,
+    int index,
+    ColorScheme colorScheme,
+    ThemeData theme,
+  ) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -410,7 +436,7 @@ class RequestDetailScreen extends ConsumerWidget {
         return AppTheme.warningDark;
       case 'rejected':
       case 'unavailable':
-        return AppTheme.infoLight; // Using info color as error equivalent
+        return AppTheme.infoLight;
       default:
         return AppTheme.infoLight;
     }

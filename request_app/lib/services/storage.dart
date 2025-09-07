@@ -8,12 +8,7 @@ Future<User> loadUserFromStorage() async {
   final role = prefs.getString('role') ?? 'user';
   final token = prefs.getString('token') ?? '';
 
-  return User(
-    id: id,
-    username: username,
-    role: role,
-    token: token,
-  );
+  return User(id: id, username: username, role: role, token: token);
 }
 
 Future<void> saveUserToStorage(User user) async {

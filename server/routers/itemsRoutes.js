@@ -1,5 +1,5 @@
 import express from "express";
-import Item, {itemTypes} from "../models/item.js";
+import Item, { itemTypes } from "../models/item.js";
 
 const itemsRouter = express.Router();
 
@@ -12,13 +12,16 @@ itemsRouter.get("/all", async (req, res) => {
     const items = await Item.find();
     res.status(200).json({ message: "Fetched all items successfully", items });
   } catch (error) {
-    res.status(500).json({ message: "Failed to fetch items", error: error.message });
+    res
+      .status(500)
+      .json({ message: "Failed to fetch items", error: error.message });
   }
 });
 
-
 itemsRouter.get("/types", async (req, res) => {
-  res.status(200).json({ message: "Fetched item types successfully", itemTypes });
+  res
+    .status(200)
+    .json({ message: "Fetched item types successfully", itemTypes });
 });
 
 export default itemsRouter;

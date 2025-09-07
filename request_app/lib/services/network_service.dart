@@ -9,26 +9,27 @@ class NetworkService {
 
   final Connectivity _connectivity = Connectivity();
   StreamSubscription<List<ConnectivityResult>>? _connectivitySubscription;
-  
+
   bool _isConnected = true;
   bool get isConnected => _isConnected;
-  
+
   final _connectionStreamController = StreamController<bool>.broadcast();
   Stream<bool> get connectionStream => _connectionStreamController.stream;
 
   Future<void> initialize() async {
-    // Check initial connectivity
     await _checkConnectivity();
-    
-    // Listen for connectivity changes
-    _connectivitySubscription = _connectivity.onConnectivityChanged.listen((List<ConnectivityResult> results) {
+
+    _connectivitySubscription = _connectivity.onConnectivityChanged.listen((
+      List<ConnectivityResult> results,
+    ) {
       _updateConnectionStatus(results);
     });
   }
 
   Future<void> _checkConnectivity() async {
     try {
-      final List<ConnectivityResult> results = await _connectivity.checkConnectivity();
+      final List<ConnectivityResult> results = await _connectivity
+          .checkConnectivity();
       _updateConnectionStatus(results);
     } catch (e) {
       debugPrint('Error checking connectivity: $e');
@@ -39,13 +40,12 @@ class NetworkService {
 
   void _updateConnectionStatus(List<ConnectivityResult> results) {
     final bool wasConnected = _isConnected;
-    _isConnected = results.isNotEmpty && 
-                   results.any((result) => 
-                     result != ConnectivityResult.none);
-    
+    _isConnected =
+        results.isNotEmpty &&
+        results.any((result) => result != ConnectivityResult.none);
+
     debugPrint('Network connectivity changed: $_isConnected');
-    
-    // Only emit if status actually changed
+
     if (wasConnected != _isConnected) {
       _connectionStreamController.add(_isConnected);
     }
@@ -53,9 +53,10 @@ class NetworkService {
 
   Future<bool> hasInternetConnection() async {
     try {
-      final List<ConnectivityResult> results = await _connectivity.checkConnectivity();
-      return results.isNotEmpty && 
-             results.any((result) => result != ConnectivityResult.none);
+      final List<ConnectivityResult> results = await _connectivity
+          .checkConnectivity();
+      return results.isNotEmpty &&
+          results.any((result) => result != ConnectivityResult.none);
     } catch (e) {
       debugPrint('Error checking internet connection: $e');
       return false;

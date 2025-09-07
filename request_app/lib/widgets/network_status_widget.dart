@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:request_app/providers/network_provider.dart';
+import 'package:request_app/services/socket.dart';
 
 class NetworkStatusWidget extends ConsumerWidget {
   final Widget child;
@@ -8,6 +9,9 @@ class NetworkStatusWidget extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+
+    SocketService().setRef(ref);
+    
     final isConnected = ref.watch(networkProvider);
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
@@ -73,6 +77,9 @@ class NetworkAwareWidget extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+
+    SocketService().setRef(ref);
+    
     final isConnected = ref.watch(networkProvider);
 
     if (!isConnected) {

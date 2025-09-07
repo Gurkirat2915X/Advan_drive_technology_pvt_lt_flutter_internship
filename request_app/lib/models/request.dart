@@ -42,6 +42,7 @@ class Request {
       'receiver': receiverId,
     };
   }
+
   @override
   String toString() {
     return 'Request{name: $name, id: $id, userId: $userId, status: $status, items: $items, createdAt: $createdAt, receiverId: $receiverId}';
